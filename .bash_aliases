@@ -25,11 +25,12 @@ OS_RELEASE=$(cat /etc/os-release | awk -F= '/NAME="/ {print $2}'  | sed -n '1p' 
 #################################################################################
 
 alias tpr='tput reset'
-alias rm='rm -f -iv'
-alias rmr='rm -rf -iv'
+alias rm='rm -iv'
+alias rmr='rm -r -iv'
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias cb='cd ../'
+alias cl=''
 
 #################################################################################
 
@@ -44,14 +45,19 @@ alias findstickybit='sudo find / -perm -4000 -ls'
 
 # grep
 alias grep='grep --color'
+alias lsmg='lsmod | grep'
 
 
 # ls
-COLOR='--color=auto'
-alias ls='ls $COLOR'
-alias lsl='ls -l $COLOR'
-alias lsa='ls -A $COLOR'
-alias lslatest='ls -t $COLOR | head'
+#COLOR='--color=auto'
+#alias ls='ls $COLOR'
+alias lsl='ls -l'
+alias lsa='ls -A'
+alias lsla='ls -l -A'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias lslatest='ls -t | head'
 
 
 
@@ -69,11 +75,49 @@ alias lslatest='ls -t $COLOR | head'
 # Dealing with files
 #################################################################################
 
+# diff
+alias diffa='diff -y --suppress-common-lines'
+
+
+
+# find
+
+
+
+# links
+alias link='ls -sr'
+
+
+
 # tar
-alias tarcreate='tar -cf'
-alias tarcreatezip='tar -cfz'
-alias tarlist='tar -tvf'
-alias tarextract='tar -xf'
+alias mktar='tar -cf'
+alias mkzip='tar -cfz'
+alias lstar='tar -tvf'
+#alias tarextract='tar -xf'
+#alias ext='extract'
+
+extract() {
+    if [ -f $1 ]; then
+        case $1 in
+
+            *.tar.bz2)   tar xjf $1        	;;
+            *.tar.gz)    tar xzf $1     	;;
+            *.bz2)       bunzip2 $1       	;;
+            *.rar)       unrar e $1     	;;
+            *.gz)        gunzip $1     		;;
+            *.tar)       tar xf $1        	;;
+            *.tbz2)      tar xjvf $1      	;;
+            *.tgz)       tar xzvf $1       	;;
+            *.zip)       unzip $1     		;;
+            *.Z)         uncompress $1  	;;
+            *.7z)        7z x $1    		;;
+
+            *)           echo "'$1' cannot be extracted via extract()" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
 
 
 
@@ -88,12 +132,12 @@ alias tarextract='tar -xf'
 
 
 #################################################################################
-# System related
+#### System related
 #################################################################################
 
 
 
-#  Package system
+### Package system
 #################################################################################
 
 if [ $OS_RELEASE == "Arch" ]; then
@@ -114,8 +158,31 @@ fi
 #################################################################################
 
 
-# System information
+### System information
 #################################################################################
+
+## Block devices
+alias lsblk='lsblk -fa'
+
+
+
+alias dmesg='dmesg -xeH'
+
+
+
+
+## Networking
+alias sdresolve='systemd-resolve --status'
+alias query='resolvectl query'
+alias dns='resolvectl dns'
+alias iptl='iptables -L'
+alias eipt='sudo vim /home/eletrao/firewall1.sh'
+
+alias ip='ip --color'
+alias ipb='ip --color --brief'
+
+##
+
 
 # pci express
 alias pcitree='lspci -t -v'
@@ -126,18 +193,28 @@ alias pcimodules='lspci -k'
 # /proc/
 alias raminfo='sudo cat /proc/meminfo && sudo dmidecode -t memory'
 alias cpuinfo='cat /proc/cpuinfo'
+alias interrupts='less /proc/interrupts'
+alias devices='less /proc/devices'
+alias iomem='sudo less /proc/iomem'
+
+
+
+# /sys/
+
+# function 
+# list input devices
+alias lsid='list_input_devices.sh'
+
+
+
+# modprobe
+alias probealias='modprobe --config /dev/null --show-depends'
+
+
 
 # uname
-#alias sysinfo='uname -rsv'
-osinfo() {
-	VERSION_STR=$(uname -v)
-	printf "os release name	: 	%s\n" 			$(uname -r)
-	printf "os name		:	%s\n" 			$(uname -s)
-	printf "os version	:	%s\n" 			$VERSION_STR
-}
-
-
-alias sysarch='uname -m'
+alias kernelversao='uname -r'
+alias arquitetura='uname -m'
 alias hostname='uname -n'
 
 #################################################################################
@@ -170,14 +247,19 @@ alias journalspace='journalctl --disk-usage'
 # systemd 
 #################################################################################
 
-alias unitstat='systemctl status'
-alias unitcat='systemctl cat'
-alias unitshow='systemctl show | less'
+alias usts='systemctl status'
+alias ucat='systemctl cat'
+alias ushow='systemctl show | less'
+alias lu='systemctl list-units'
+alias luf='systemctl list-unit-files'
+alias luff='systemctl list-units --failed'
 
 
-alias unitstop='sudo systemctl stop'
-alias unitstart='sudo systemctl start'
-alias unitdis='sudo systemctl disable'
+alias ustop='sudo systemctl stop'
+alias ugo='sudo systemctl start'
+alias urr='sudo systemctl restart'
+alias unable='sudo systemctl enable'
+alias udis='sudo systemctl disable'
 
 
 alias cgls='systemd-cgls'
@@ -204,6 +286,10 @@ alias ttinit='systemd-analyze blame | head -7' # list units by time to init
 #################################################################################
 
 
+#github
+alias gc='git clone'
+
+
 # parsers
 alias sed1p='sed -n "1p"'
 alias sed2p='sed -n "2p"'
@@ -214,22 +300,6 @@ alias ddex='printf "dd if=/dev/sda of=/tmp/COPY_OF_MBR bs=512 count=1\n"'
 
 
 
-## home fs
-#alias mecatronica='cd ~/Documents/mecatronica'
-#alias mecatronicaov='cd ~/Documents/mecatronica/mechatronics_overview/'
-#alias programming='cd ~/Documents/programming/'
-#alias bash='cd ~/Documents/programming/bash/'
-#alias gitclones='cd ~/Documents/programming/gitclones'
-#alias handbook='cd ~/Documents/linux_handbook'
-#
-#create_home()
-#{
-#docdirs=(~/Documents/mecatronica ~/Documents/programming ~/Documents/linux)
-#for i in ${docdirs[@]}; do
-#	printf "creating %s\n" $i
-#	mkdir $i
-#done
-#}
 
 
 
