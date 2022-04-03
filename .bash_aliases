@@ -9,8 +9,8 @@
 
 
 
-OS_RELEASE=$(cat /etc/os-release | awk -F= '/NAME="/ {print $2}'  | sed -n '1p' | cut -d'"' -f 2)
-
+OS_RELEASE=$(cat /etc/os-release | awk -F= '/NAME="/ {print $2}'  | sed -n '1p' | cut -d'"' -f 2 | cut -f 1 -d " ")
+#printf "[bash_aliases] OS_REALEASE : %s\n" $OS_RELEASE
 
 
 
@@ -40,6 +40,7 @@ alias cl=''
 
 # find
 # find / \( -perm -4000 -fprintf /root/suid.txt '%#m %u %p\n' \) , \\( -size +100M -fprintf /root/big.txt '%-10s %p\n' \)
+# find . -name "system*" -type f -exec cp "{}" sbin/ \;
 alias findstickybit='sudo find / -perm -4000 -ls'
 
 
@@ -52,6 +53,7 @@ alias lsmg='lsmod | grep'
 #COLOR='--color=auto'
 #alias ls='ls $COLOR'
 alias lsl='ls -l'
+alias lsld='ls -ld'
 alias lsa='ls -A'
 alias lsla='ls -l -A'
 alias ll='ls -alF'
@@ -124,7 +126,9 @@ extract() {
 #################################################################################
 #################################################################################
 
-
+# Dealing with users and groups
+alias addusertogroup='groupmod -a -U'
+alias listusergroups='groups'
 
 
 
